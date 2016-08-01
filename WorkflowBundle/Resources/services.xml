@@ -1,0 +1,14 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+    <services>
+        <service id="bsapaka_workflow.workflow_manager" class="Bsapaka\WorkflowBundle\WorkflowManager">
+        </service>
+        <service id="bsapaka_workflow.form_loader.default" class="Bsapaka\WorkflowBundle\FormLoader\FormLoader">
+            <argument type="service" id="form.factory" />
+            <tag name="bsapaka_workflow.form_loader" />
+        </service>
+    </services>
+</container>
