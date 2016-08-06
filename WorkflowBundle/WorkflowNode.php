@@ -15,7 +15,20 @@ abstract class WorkflowNode
     protected $parent;
 
     /**
-     * @return mixed
+     * @var int
+     */
+    protected $index;
+
+    /**
+     * @return string
+     */
+    public function getName()
+    {
+        return $this->getConfig()->getName();
+    }
+
+    /**
+     * @return ConfigInterface
      */
     public function getConfig()
     {
@@ -52,5 +65,26 @@ abstract class WorkflowNode
 
         return $this;
     }
+
+    /**
+     * @return int
+     */
+    public function getIndex()
+    {
+        return $this->index;
+    }
+
+    /**
+     * @param int $index
+     * @return WorkflowNode
+     */
+    public function setIndex($index)
+    {
+        $this->index = $index;
+
+        return $this;
+    }
+
+
 
 }
