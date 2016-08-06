@@ -2,6 +2,9 @@
 
 namespace Bsapaka\WorkflowBundle;
 
+use Symfony\Component\OptionsResolver\Options;
+use Symfony\Component\OptionsResolver\OptionsResolver;
+
 class Config implements ConfigInterface
 {
 
@@ -11,47 +14,42 @@ class Config implements ConfigInterface
     protected $node;
 
     /**
-     * @var string
+     * @var array
      */
-    protected $name;
-
-    /**
-     * @var string
-     */
-    protected $urlSegment;
-
-    /**
-     * @var string
-     */
-    protected $template;
-
-    /**
-     * @var string
-     */
-    protected $formLoaderClass;
+    protected $rawOptions;
 
     /**
      * @var array
      */
-    protected $formModifications;
+    protected $options;
 
     /**
-     * @var string
+     * @var OptionsResolver
      */
-    protected $submitHandlerClass;
-
-
-    protected $persistenceHandler;
+    protected $optionsResolver;
 
     /**
-     * @var array
+     * Config constructor.
+     * @param array $options
      */
-    protected $rolesWhitelist = [];
+    public function __construct(array $options = [])
+    {
+        $this->rawOptions = $options;
+
+        $resolver = new OptionsResolver();
+        $this->configureResolver($resolver);
+        $this->optionsResolver = $resolver;
+
+        $this->resolveOptions();
+    }
 
     /**
-     * @var array
+     * @return void
      */
-    protected $rolesBlacklist = [];
+    public function resolveOptions()
+    {
+        $this->options = $this->optionsResolver->resolve($this->rawOptions);
+    }
 
     /**
      * @return WorkflowNode
@@ -62,11 +60,20 @@ class Config implements ConfigInterface
     }
 
     /**
+     * @param WorkflowNode $node
+     * @return Config
+     */
+    public function setNode(WorkflowNode $node)
+    {
+        $this->node = $node;
+    }
+
+    /**
      * @return string
      */
     public function getName()
     {
-        return $this->name;
+        return $this->options['name'];
     }
 
     /**
@@ -74,10 +81,80 @@ class Config implements ConfigInterface
      */
     public function getUrlSegment()
     {
-        if ($this->urlSegment) {
-            return $this->urlSegment;
+        if ($urlSegment = $this->options['url_segment']) {
+            return $urlSegment;
         } else {
             return $this->sluggify($this->getName());
+        }
+    }
+
+    /**
+     * @return string
+     */
+    public function getTemplate()
+    {
+        return $this->options['template'];
+    }
+
+    /**
+     * @return string
+     */
+    public function getFormLoaderClass()
+    {
+        return $this->options['form_loader_class'];
+    }
+
+    /**
+     * @return string
+     */
+    public function getSubmitHandlerClass()
+    {
+        return $this->options['submit_handler_class'];
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getPersistenceHandler()
+    {
+        return $this->options['persistence_handler'];
+    }
+
+    /**
+     * @return array
+     */
+    public function getRolesWhitelist()
+    {
+        return $this->options['roles_whitelist'];
+    }
+
+    /**
+     * @return array
+     */
+    public function getRolesBlacklist()
+    {
+        return $this->options['roles_blacklist'];
+    }
+
+    /**
+     * Get the value of a config option.
+     *
+     * If no value, then recurse through parents and return
+     * their option value
+     *
+     * @param string $option
+     *
+     * @return mixed
+     */
+    public function getOption($option)
+    {
+        if (null === $this->options[$option] &&
+            $node = $this->getNode() &&
+            $parentNode = $this->getNode()->getParent()
+        ) {
+            return $parentNode->getConfig()->getOption($option);
+        } else {
+            return $this->options[$option];
         }
     }
 
@@ -95,164 +172,71 @@ class Config implements ConfigInterface
     }
 
     /**
-     * @return string
+     * @param OptionsResolver $resolver
      */
-    public function getTemplate()
+    protected function configureResolver(OptionsResolver $resolver)
     {
-        return $this->getProperty('template');
+        $this->defineOptions($resolver);
+
+        $this->defineAllowedTypes($resolver);
+
+        $this->defineInheritance($resolver);
+
+        $resolver->isRequired('name');
+
+        $resolver->setDefault('url_segment', function (Options $options) {
+            return $this->sluggify($options['name']);
+        });
+
     }
 
-    /**
-     * @return string
-     */
-    public function getFormLoaderClass()
+    protected function defineOptions(OptionsResolver $resolver)
     {
-        return $this->getProperty('formLoaderClass');
+        $resolver->setDefined([
+            'name',
+            'url_segment',
+            'template',
+            'form_loader_class',
+            'submit_handler_class',
+            'persistence_handler',
+            'roles_whitelist',
+            'roles_blacklist',
+        ]);
     }
 
-    /**
-     * @return string
-     */
-    public function getSubmitHandlerClass()
+    protected function defineAllowedTypes(OptionsResolver $resolver)
     {
-        return $this->getProperty('submitHandlerClass');
+        // TODO: allowed types
+//        $resolver->setAllowedTypes([
+//            'name' => ['string','NULL'],
+//            'url_segment' => ['string','NULL'],
+//            'template' => ['string','NULL'],
+//            'form_loader_class'=> ['string','NULL'],
+//            'submit_handler_class' => ['string','NULL'],
+//            // 'persistence_handler'  => ? , // TODO: persistence handler option
+//            'roles_whitelist'  => 'array',
+//            'roles_blacklist'  => 'array',
+//        ]);
     }
 
-    /**
-     * @return mixed
-     */
-    public function getPersistenceHandler()
+    protected function defineInheritance(OptionsResolver $resolver)
     {
-        return $this->getProperty('persistenceHandler');
-    }
+        $inheritables = [
+            'template',
+            'form_loader_class',
+            'submit_handler_class',
+            'persistence_handler',
+            'roles_whitelist',
+            'roles_blacklist',
+        ];
 
-    /**
-     * @return array
-     */
-    public function getRolesWhitelist()
-    {
-        return $this->getProperty('rolesWhitelist');
-    }
-
-    /**
-     * @return array
-     */
-    public function getRolesBlacklist()
-    {
-        return $this->getProperty('rolesBlacklist');
-    }
-
-    /**
-     * Get the value of a config property.
-     *
-     * If no value, then recurse up the composite tree until
-     * a value is found or the top level parent is reached.
-     *
-     * @param string $property
-     *
-     * @return mixed
-     */
-    protected function getProperty($property, $inherit = true)
-    {
-        if (null === $this->$property &&
-            true === $inherit &&
-            $parentNode = $this->getNode()->getParent()
-        ) {
-            $getProperty = 'get' . $property;
-            return $parentNode->getConfig()->$getProperty();
-        } else {
-            return $this->$property;
+        foreach ($inheritables as $inheritable) {
+            $resolver->setDefault($inheritable,
+                function (Options $options) use ($inheritable) {
+                    return $this->getOption($inheritable);
+                }
+            );
         }
     }
-
-    # region Setters
-    /**
-     * @param WorkflowNode $node
-     * @return Config
-     */
-    public function setNode($node)
-    {
-        $this->node = $node;
-
-        return $this;
-    }
-
-    /**
-     * @param string $name
-     * @return Config
-     */
-    public function setName($name)
-    {
-        $this->name = $name;
-
-        return $this;
-    }
-
-    /**
-     * @param string $urlSegment
-     * @return Config
-     */
-    public function setUrlSegment($urlSegment)
-    {
-        $this->urlSegment = $urlSegment;
-
-        return $this;
-    }
-
-    /**
-     * @param string $template
-     * @return Config
-     */
-    public function setTemplate($template)
-    {
-        $this->template = $template;
-
-        return $this;
-    }
-
-    /**
-     * @param string $formLoaderClass
-     * @return Config
-     */
-    public function setFormLoaderClass($formLoaderClass)
-    {
-        $this->formLoaderClass = $formLoaderClass;
-
-        return $this;
-    }
-
-    /**
-     * @param array $formModifications
-     * @return Config
-     */
-    public function setFormModifications($formModifications)
-    {
-        $this->formModifications = $formModifications;
-
-        return $this;
-    }
-
-    /**
-     * @param string $submitHandlerClass
-     * @return Config
-     */
-    public function setSubmitHandlerClass($submitHandlerClass)
-    {
-        $this->submitHandlerClass = $submitHandlerClass;
-
-        return $this;
-    }
-
-    /**
-     * @param mixed $persistenceHandler
-     * @return Config
-     */
-    public function setPersistenceHandler($persistenceHandler)
-    {
-        $this->persistenceHandler = $persistenceHandler;
-
-        return $this;
-    }
-    #Endregion
 
 }

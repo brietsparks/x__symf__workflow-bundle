@@ -10,7 +10,7 @@ abstract class WorkflowNode
     protected $config;
 
     /**
-     * @var WorkflowNode
+     * @var Workflow
      */
     protected $parent;
 
@@ -48,7 +48,7 @@ abstract class WorkflowNode
     }
 
     /**
-     * @return WorkflowNode
+     * @return Workflow
      */
     public function getParent()
     {

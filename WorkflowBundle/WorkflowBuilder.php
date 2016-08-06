@@ -10,11 +10,10 @@ class WorkflowBuilder
      */
     protected $workflow;
 
-    public function add(WorkflowNode $workflowNode)
+    public function addWorkflow($name, $urlSegment, array $options = [], callable $build)
     {
-        $this->workflow->add($workflowNode);
+        $config = new Config();
 
-        return $this;
     }
 
     /**

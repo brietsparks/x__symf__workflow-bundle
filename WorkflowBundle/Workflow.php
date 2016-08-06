@@ -23,6 +23,7 @@ class Workflow extends WorkflowNode
     {
         // TODO: check if child with name exists
         $child->setParent($this);
+        $child->getConfig()->resolveOptions();
         $this->children[] = $child;
         $this->reindexChildren();
 
