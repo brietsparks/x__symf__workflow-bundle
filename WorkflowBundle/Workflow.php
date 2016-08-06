@@ -21,6 +21,7 @@ class Workflow extends WorkflowNode
      */
     public function add(WorkflowNode $child)
     {
+        // TODO: check if child with name exists
         $child->setParent($this);
         $this->children[] = $child;
         $this->reindexChildren();
@@ -28,21 +29,78 @@ class Workflow extends WorkflowNode
         return $this;
     }
 
+
     /**
+     * Recursively search down the tree for a step by its name
+     *
      * @param string $name
-     * @return WorkflowNode
+     *
+     * @return Step
      */
-    public function getChildByName($name)
+    public function findStepRecursively($name)
     {
         /** @var WorkflowNode $child */
-        foreach ($this->children as $child) {
-            if ($child->getConfig()->getName() === $name) {
+        foreach ((array) $this->children as $child) {
+            if ($child instanceof Step && $child->getConfig()->getName() === $name) {
                 return $child;
+            }
+        }
+
+        foreach ((array) $this->children as $child) {
+            if ($child instanceof Workflow) {
+                return $child->findStep($name);
             }
         }
     }
 
+    /**
+     * @param $name
+     * @param bool $deep
+     * @throws RuntimeException
+     * @return Step|WorkflowNode
+     */
+    public function getStepByName($name, $deep = false)
+    {
+        if ($deep) {
+            $step = $this->findStepRecursively($name);
+            if (!$step) {
+                throw new RuntimeException("Step with name '{$name}' does not exist in Workflow tree named '{$this->getName()}'.");
+            }
+        } else {
+            $step = $this->getChildByName($name);
+        }
 
+        return $step;
+    }
+
+    /**
+     * @param string $name
+     * @throws RuntimeException
+     * @return WorkflowNode
+     */
+    public function getChildByName($name)
+    {
+        $namedChild = null;
+
+        /** @var WorkflowNode $child */
+        foreach ($this->children as $child) {
+            if ($child->getConfig()->getName() === $name) {
+                $namedChild = $child;
+            }
+        }
+
+        if(!$namedChild) {
+            throw new RuntimeException("Child WorkflowNode with name '{$name}' does not exist in Workflow named '{$this->getName()}'.");
+        }
+
+        return $namedChild;
+    }
+
+    /**
+     * @param $index
+     * @throws RuntimeException
+     * @return WorkflowNode
+     */
     public function getChildByIndex($index)
     {
         if(!is_numeric($index)) {
@@ -52,7 +110,7 @@ class Workflow extends WorkflowNode
         $index = intval($index);
 
         if (!$this->hasIndex($index)) {
-            throw new RuntimeException("WorkflowNode at index {$index} does not exist in Workflow named '{$this->getName()}'.");
+            throw new RuntimeException("There is no Child WorkflowNode with an index of {$index} in Workflow named '{$this->getName()}'.");
         }
 
         return $this->children[$index];
