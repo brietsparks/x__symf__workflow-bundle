@@ -44,6 +44,16 @@ class Config implements ConfigInterface
     protected $persistenceHandler;
 
     /**
+     * @var array
+     */
+    protected $rolesWhitelist = [];
+
+    /**
+     * @var array
+     */
+    protected $rolesBlacklist = [];
+
+    /**
      * @return WorkflowNode
      */
     public function getNode()
@@ -114,6 +124,22 @@ class Config implements ConfigInterface
     public function getPersistenceHandler()
     {
         return $this->getProperty('persistenceHandler');
+    }
+
+    /**
+     * @return array
+     */
+    public function getRolesWhitelist()
+    {
+        return $this->getProperty('rolesWhitelist');
+    }
+
+    /**
+     * @return array
+     */
+    public function getRolesBlacklist()
+    {
+        return $this->getProperty('rolesBlacklist');
     }
 
     /**

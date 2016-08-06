@@ -48,7 +48,7 @@ class Workflow extends WorkflowNode
 
         foreach ((array) $this->children as $child) {
             if ($child instanceof Workflow) {
-                return $child->findStep($name);
+                return $child->findStepRecursively($name);
             }
         }
     }
@@ -59,7 +59,7 @@ class Workflow extends WorkflowNode
      * @throws RuntimeException
      * @return Step|WorkflowNode
      */
-    public function getStepByName($name, $deep = false)
+    public function getStepByName($name, $deep = true)
     {
         if ($deep) {
             $step = $this->findStepRecursively($name);
@@ -90,7 +90,7 @@ class Workflow extends WorkflowNode
         }
 
         if(!$namedChild) {
-            throw new RuntimeException("Child WorkflowNode with name '{$name}' does not exist in Workflow named '{$this->getName()}'.");
+            throw new RuntimeException("There is no child WorkflowNode named '{$name}' in Workflow named '{$this->getName()}'.");
         }
 
         return $namedChild;
@@ -110,7 +110,7 @@ class Workflow extends WorkflowNode
         $index = intval($index);
 
         if (!$this->hasIndex($index)) {
-            throw new RuntimeException("There is no Child WorkflowNode with an index of {$index} in Workflow named '{$this->getName()}'.");
+            throw new RuntimeException("There is no child WorkflowNode with an index of {$index} in Workflow named '{$this->getName()}'.");
         }
 
         return $this->children[$index];
