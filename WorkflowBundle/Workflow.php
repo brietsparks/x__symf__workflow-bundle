@@ -17,9 +17,20 @@ class Workflow extends WorkflowNode
      */
     public function add(WorkflowNode $child)
     {
+        $child->setParent($this);
         $this->children[] = $child;
 
         return $this;
     }
+
+    /**
+     * @return array
+     */
+    public function getChildren()
+    {
+        return $this->children;
+    }
+
+
 
 }

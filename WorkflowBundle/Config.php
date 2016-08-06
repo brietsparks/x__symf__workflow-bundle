@@ -2,7 +2,7 @@
 
 namespace Bsapaka\WorkflowBundle;
 
-class Config
+class Config implements ConfigInterface
 {
 
     /**
@@ -40,13 +40,8 @@ class Config
      */
     protected $submitHandlerClass;
 
-    
-    protected $persistenceHandler;
 
-    /**
-     * @var bool
-     */
-    protected $validate;
+    protected $persistenceHandler;
 
     /**
      * @return WorkflowNode
@@ -94,7 +89,7 @@ class Config
      */
     public function getTemplate()
     {
-        return $this->resolvePropertyValue('template');
+        return $this->getProperty('template');
     }
 
     /**
@@ -102,7 +97,23 @@ class Config
      */
     public function getFormLoaderClass()
     {
-        return $this->resolvePropertyValue('formLoaderClass');
+        return $this->getProperty('formLoaderClass');
+    }
+
+    /**
+     * @return string
+     */
+    public function getSubmitHandlerClass()
+    {
+        return $this->getProperty('submitHandlerClass');
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getPersistenceHandler()
+    {
+        return $this->getProperty('persistenceHandler');
     }
 
     /**
@@ -115,16 +126,107 @@ class Config
      *
      * @return mixed
      */
-    protected function resolvePropertyValue($property, $inherit = true)
+    protected function getProperty($property, $inherit = true)
     {
         if (null === $this->$property &&
             true === $inherit &&
             $parentNode = $this->getNode()->getParent()
         ) {
             $getProperty = 'get' . $property;
-            return $parentNode->getConfig()->$getProperty;
+            return $parentNode->getConfig()->$getProperty();
         } else {
             return $this->$property;
         }
     }
+
+    # region Setters
+    /**
+     * @param WorkflowNode $node
+     * @return Config
+     */
+    public function setNode($node)
+    {
+        $this->node = $node;
+
+        return $this;
+    }
+
+    /**
+     * @param string $name
+     * @return Config
+     */
+    public function setName($name)
+    {
+        $this->name = $name;
+
+        return $this;
+    }
+
+    /**
+     * @param string $urlSegment
+     * @return Config
+     */
+    public function setUrlSegment($urlSegment)
+    {
+        $this->urlSegment = $urlSegment;
+
+        return $this;
+    }
+
+    /**
+     * @param string $template
+     * @return Config
+     */
+    public function setTemplate($template)
+    {
+        $this->template = $template;
+
+        return $this;
+    }
+
+    /**
+     * @param string $formLoaderClass
+     * @return Config
+     */
+    public function setFormLoaderClass($formLoaderClass)
+    {
+        $this->formLoaderClass = $formLoaderClass;
+
+        return $this;
+    }
+
+    /**
+     * @param array $formModifications
+     * @return Config
+     */
+    public function setFormModifications($formModifications)
+    {
+        $this->formModifications = $formModifications;
+
+        return $this;
+    }
+
+    /**
+     * @param string $submitHandlerClass
+     * @return Config
+     */
+    public function setSubmitHandlerClass($submitHandlerClass)
+    {
+        $this->submitHandlerClass = $submitHandlerClass;
+
+        return $this;
+    }
+
+    /**
+     * @param mixed $persistenceHandler
+     * @return Config
+     */
+    public function setPersistenceHandler($persistenceHandler)
+    {
+        $this->persistenceHandler = $persistenceHandler;
+
+        return $this;
+    }
+    #Endregion
+
 }
