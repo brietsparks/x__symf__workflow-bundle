@@ -21,10 +21,15 @@ class Workflow extends WorkflowNode
      */
     public function add(WorkflowNode $child)
     {
-        // TODO: check if child with name exists
+        $name = $child->getName();
+        if ($this->hasChildWithName($name)) {
+            throw new RuntimeException("Cannot add a WorkflowNode named '$name' to Workflow named '{$this->getName()}' because the Workflow already has a child with that name.");
+        }
+
         $child->setParent($this);
-        $child->getConfig()->resolveOptions();
+
         $this->children[] = $child;
+
         $this->reindexChildren();
 
         return $this;
@@ -40,11 +45,8 @@ class Workflow extends WorkflowNode
      */
     public function findStepRecursively($name)
     {
-        /** @var WorkflowNode $child */
-        foreach ((array) $this->children as $child) {
-            if ($child instanceof Step && $child->getConfig()->getName() === $name) {
-                return $child;
-            }
+        if ($this->hasChildWithName($name)) {
+            return $this->getChildByName($name);
         }
 
         foreach ((array) $this->children as $child) {
@@ -72,6 +74,25 @@ class Workflow extends WorkflowNode
         }
 
         return $step;
+    }
+
+    /**
+     * @param string $name
+     * @return bool
+     */
+    public function hasChildWithName($name)
+    {
+        /** @var WorkflowNode $child */
+        foreach ((array) $this->children as $child) {
+            if ($child instanceof Step && $child->getConfig()->getName() === $name) {
+                return true;
+            }
+        }
+    }
+
+    public function getNodeByPath($fullName)
+    {
+
     }
 
     /**

@@ -4,18 +4,15 @@ namespace Bsapaka\WorkflowBundle;
 interface ConfigInterface
 {
 
-    public function resolveOptions();
+    /**
+     * @param array $options
+     */
+    public function inheritOptions(array $options);
 
     /**
-     * @param string $option
-     * @return mixed
+     * @return array
      */
-    public function getOption($option);
-
-    /**
-     * @return WorkflowNode
-     */
-    public function getNode();
+    public function getOptions();
 
     /**
      * @return string
@@ -48,51 +45,3 @@ interface ConfigInterface
     public function getPersistenceHandler();
 
 }
-
-//    /**
-//     * @param WorkflowNode $node
-//     * @return ConfigInterface
-//     */
-//    public function setNode($node);
-//
-//    /**
-//     * @param string $name
-//     * @return ConfigInterface
-//     */
-//    public function setName($name);
-//
-//    /**
-//     * @param string $urlSegment
-//     * @return ConfigInterface
-//     */
-//    public function setUrlSegment($urlSegment);
-//
-//    /**
-//     * @param string $template
-//     * @return ConfigInterface
-//     */
-//    public function setTemplate($template);
-//
-//    /**
-//     * @param string $formLoaderClass
-//     * @return ConfigInterface
-//     */
-//    public function setFormLoaderClass($formLoaderClass);
-//
-//    /**
-//     * @param array $formModifications
-//     * @return ConfigInterface
-//     */
-//    public function setFormModifications($formModifications);
-//
-//    /**
-//     * @param string $submitHandlerClass
-//     * @return ConfigInterface
-//     */
-//    public function setSubmitHandlerClass($submitHandlerClass);
-//
-//    /**
-//     * @param mixed $persistenceHandler
-//     * @return ConfigInterface
-//     */
-//    public function setPersistenceHandler($persistenceHandler);

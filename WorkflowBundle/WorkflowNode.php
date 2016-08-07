@@ -27,6 +27,30 @@ abstract class WorkflowNode
         return $this->getConfig()->getName();
     }
 
+    // TODO: path related methods should be in their own class
+    // TODO: pathFinder, WorkflowTreeNavigator
+    /**
+     * @return array
+     */
+    public function getPathArray()
+    {
+        $namePath[] = $this->getName();
+
+        if ($parent = $this->getParent()) {
+            $namePath = array_merge($parent->getPathArray(), $namePath);
+        }
+
+        return $namePath;
+    }
+
+    /**
+     * @return string
+     */
+    public function getPath()
+    {
+        return join(".", $this->getPathArray());
+    }
+
     /**
      * @return ConfigInterface
      */
@@ -42,7 +66,6 @@ abstract class WorkflowNode
     public function setConfig(ConfigInterface $config)
     {
         $this->config = $config;
-        $config->setNode($this);
 
         return $this;
     }
@@ -56,12 +79,16 @@ abstract class WorkflowNode
     }
 
     /**
-     * @param WorkflowNode $parent
+     * @param Workflow $parent
      * @return WorkflowNode
      */
     public function setParent($parent)
     {
         $this->parent = $parent;
+
+        $this->getConfig()->inheritOptions(
+            $parent->getConfig()->getOptions()
+        );
 
         return $this;
     }
@@ -84,7 +111,4 @@ abstract class WorkflowNode
 
         return $this;
     }
-
-
-
 }

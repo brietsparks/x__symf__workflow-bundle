@@ -10,10 +10,16 @@ class WorkflowBuilder
      */
     protected $workflow;
 
-    public function addWorkflow($name, $urlSegment, array $options = [], callable $build)
+    public function addWorkflow($child, $urlSegment = null, array $options = [], callable $build)
     {
         $config = new Config();
+    }
 
+    public function addStep($child, $urlSegment = null, array $options = [], callable $build)
+    {
+        if ($child instanceof StepTypeInterface) {
+
+        }
     }
 
     /**

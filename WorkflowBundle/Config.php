@@ -9,24 +9,23 @@ class Config implements ConfigInterface
 {
 
     /**
-     * @var WorkflowNode
-     */
-    protected $node;
-
-    /**
+     * The initial unresolved options
+     *
      * @var array
      */
     protected $rawOptions;
 
     /**
+     * Resolved options
+     *
      * @var array
      */
     protected $options;
 
     /**
-     * @var OptionsResolver
+     * @var ConfigOptionsResolver
      */
-    protected $optionsResolver;
+    protected $resolver;
 
     /**
      * Config constructor.
@@ -35,37 +34,33 @@ class Config implements ConfigInterface
     public function __construct(array $options = [])
     {
         $this->rawOptions = $options;
-
-        $resolver = new OptionsResolver();
-        $this->configureResolver($resolver);
-        $this->optionsResolver = $resolver;
-
-        $this->resolveOptions();
+        $this->resolver = new ConfigOptionsResolver();
+        $this->options = $this->resolver->resolve($options);
     }
 
     /**
-     * @return void
+     * @param array $options
      */
-    public function resolveOptions()
+    public function inheritOptions(array $options)
     {
-        $this->options = $this->optionsResolver->resolve($this->rawOptions);
+        $this->options = $this->resolver->inherit($options, $this->options);
     }
 
     /**
-     * @return WorkflowNode
+     * @return array
      */
-    public function getNode()
+    public function getOptions()
     {
-        return $this->node;
+        return $this->options;
     }
 
     /**
-     * @param WorkflowNode $node
-     * @return Config
+     * @param string $option
+     * @return mixed
      */
-    public function setNode(WorkflowNode $node)
+    public function getOption($option)
     {
-        $this->node = $node;
+        return $this->options['option'];
     }
 
     /**
@@ -81,11 +76,7 @@ class Config implements ConfigInterface
      */
     public function getUrlSegment()
     {
-        if ($urlSegment = $this->options['url_segment']) {
-            return $urlSegment;
-        } else {
-            return $this->sluggify($this->getName());
-        }
+        return $this->options['url_segment'];
     }
 
     /**
@@ -134,109 +125,6 @@ class Config implements ConfigInterface
     public function getRolesBlacklist()
     {
         return $this->options['roles_blacklist'];
-    }
-
-    /**
-     * Get the value of a config option.
-     *
-     * If no value, then recurse through parents and return
-     * their option value
-     *
-     * @param string $option
-     *
-     * @return mixed
-     */
-    public function getOption($option)
-    {
-        if (null === $this->options[$option] &&
-            $node = $this->getNode() &&
-            $parentNode = $this->getNode()->getParent()
-        ) {
-            return $parentNode->getConfig()->getOption($option);
-        } else {
-            return $this->options[$option];
-        }
-    }
-
-    /**
-     * @param $string
-     *
-     * @return string
-     */
-    protected function sluggify($string)
-    {
-        $string = strtolower(trim($string));
-        $string = preg_replace('/[^a-z0-9-]/', '-', $string);
-        $string = preg_replace('/-+/', "-", $string);
-        return $string;
-    }
-
-    /**
-     * @param OptionsResolver $resolver
-     */
-    protected function configureResolver(OptionsResolver $resolver)
-    {
-        $this->defineOptions($resolver);
-
-        $this->defineAllowedTypes($resolver);
-
-        $this->defineInheritance($resolver);
-
-        $resolver->isRequired('name');
-
-        $resolver->setDefault('url_segment', function (Options $options) {
-            return $this->sluggify($options['name']);
-        });
-
-    }
-
-    protected function defineOptions(OptionsResolver $resolver)
-    {
-        $resolver->setDefined([
-            'name',
-            'url_segment',
-            'template',
-            'form_loader_class',
-            'submit_handler_class',
-            'persistence_handler',
-            'roles_whitelist',
-            'roles_blacklist',
-        ]);
-    }
-
-    protected function defineAllowedTypes(OptionsResolver $resolver)
-    {
-        // TODO: allowed types
-//        $resolver->setAllowedTypes([
-//            'name' => ['string','NULL'],
-//            'url_segment' => ['string','NULL'],
-//            'template' => ['string','NULL'],
-//            'form_loader_class'=> ['string','NULL'],
-//            'submit_handler_class' => ['string','NULL'],
-//            // 'persistence_handler'  => ? , // TODO: persistence handler option
-//            'roles_whitelist'  => 'array',
-//            'roles_blacklist'  => 'array',
-//        ]);
-    }
-
-    protected function defineInheritance(OptionsResolver $resolver)
-    {
-        $inheritables = [
-            'template',
-            'form_loader_class',
-            'submit_handler_class',
-            'persistence_handler',
-            'roles_whitelist',
-            'roles_blacklist',
-        ];
-
-        foreach ($inheritables as $inheritable) {
-            $resolver->setDefault($inheritable,
-                function (Options $options) use ($inheritable) {
-                    return $this->getOption($inheritable);
-                }
-            );
-        }
     }
 
 }
