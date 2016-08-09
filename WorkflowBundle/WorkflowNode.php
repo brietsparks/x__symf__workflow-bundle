@@ -27,6 +27,22 @@ abstract class WorkflowNode
         return $this->getConfig()->getName();
     }
 
+    /**
+     * @return callable
+     */
+    public function getSubmitHandlerCallable()
+    {
+        return $this->getConfig()->getSubmitHandlerCallable();
+    }
+
+    /**
+     * @return callable
+     */
+    public function getNextStepCallable()
+    {
+        return $this->getConfig()->getNextStepCallable();
+    }
+
     // TODO: path related methods should be in their own class
     // TODO: pathFinder, WorkflowTreeNavigator
     /**

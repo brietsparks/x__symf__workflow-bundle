@@ -96,11 +96,19 @@ class Config implements ConfigInterface
     }
 
     /**
-     * @return string
+     * @return callable
      */
-    public function getSubmitHandlerClass()
+    public function getSubmitHandlerCallable()
     {
-        return $this->options['submit_handler_class'];
+        return $this->options['submit_handler_callable'];
+    }
+
+    /**
+     * @return callable
+     */
+    public function getNextStepCallable()
+    {
+        return $this->options['next_step_callable'];
     }
 
     /**

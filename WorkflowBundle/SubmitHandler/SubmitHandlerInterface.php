@@ -10,6 +10,13 @@ interface SubmitHandlerInterface
     /**
      * @return string
      */
-    public function getNextStepName();
+    public function getStepPath();
+
+    /**
+     * @return string
+     */
+    public function getNextStepPath();
+
+
 
 }

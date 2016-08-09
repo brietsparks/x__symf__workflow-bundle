@@ -10,23 +10,51 @@ class FormLoaderCompilerPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container)
     {
-        if (!$container->has('bsapaka_workflow.workflow_manager')) {
+        $this->findWorkflowManagerTags($container);
+    }
+    
+    protected function findSubmitHandlerTags(ContainerBuilder $container)
+    {
+        if (!$container->has('bsapaka_workflow.workflow_controller')) {
             return;
         }
 
         $definition = $container->findDefinition(
-            'bsapaka_workflow.workflow_manager'
+            'bsapaka_workflow.workflow_controller'
         );
 
         $taggedServices = $container->findTaggedServiceIds(
-            'bsapaka_workflow.form_loader'
+            'bsapaka_workflow.submit_handler'
         );
 
         foreach ($taggedServices as $id => $tags) {
             $definition->addMethodCall(
-                'addFormLoader',
+                'addSubmitHandler',
                 array(new Reference($id))
             );
         }
     }
+
+//    protected function findWorkflowManagerTags(ContainerBuilder $container)
+//    {
+//        if (!$container->has('bsapaka_workflow.workflow_controller')) {
+//            return;
+//        }
+//
+//        $definition = $container->findDefinition(
+//            'bsapaka_workflow.workflow_controller'
+//        );
+//
+//        $taggedServices = $container->findTaggedServiceIds(
+//            'bsapaka_workflow.form_loader'
+//        );
+//
+//        foreach ($taggedServices as $id => $tags) {
+//            $definition->addMethodCall(
+//                'addFormLoader',
+//                array(new Reference($id))
+//            );
+//        }
+//    }
+    
 }

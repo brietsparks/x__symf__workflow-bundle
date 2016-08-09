@@ -35,9 +35,14 @@ interface ConfigInterface
     public function getFormLoaderClass();
 
     /**
-     * @return string
+     * @return callable
      */
-    public function getSubmitHandlerClass();
+    public function getSubmitHandlerCallable();
+
+    /**
+     * @return callable
+     */
+    public function getNextStepCallable();
 
     /**
      * @return mixed
