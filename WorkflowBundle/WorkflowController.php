@@ -1,6 +1,9 @@
 <?php namespace Bsapaka\WorkflowBundle;
 
 
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\HttpFoundation\Session\Session;
+
 class WorkflowController
 {
 
@@ -14,17 +17,22 @@ class WorkflowController
      */
     protected $submitHandlers;
 
-    protected $nextStep;
+    /**
+     * @var Session
+     */
+    protected $session;
+
+
 
     public function processStepCompletion()
     {
         $step = $this->getCurrentStep();
         $handler = $this->getSubmitHandler($step->getPath());
-            
+
         if ($handler) {
-            $handler->handle();
+            $handler->setWorkflowController($this)->handle();
         } elseif ($handle = $step->getSubmitHandlerCallable()) {
-            $handle();
+            $handle($this);
         } else {
             // TODO: throw no handler exception OR do nothing OR
             throw new \Exception();
@@ -33,7 +41,7 @@ class WorkflowController
         if ($handler) {
             $nextStep = $this->getStepByPath($handler->getNextStepPath());
         } elseif ($getNextStep = $step->getNextStepCallable()) {
-            $nextStep = $getNextStep();
+            $nextStep = $getNextStep($this);
         } else {
             // TODO: throw no next step exception OR implement a default next step handler
             throw new \Exception();
@@ -57,20 +65,20 @@ class WorkflowController
     }
 
     /**
-     * @param $path
-     * @return SubmitHandlerInterface
+     * @param string $path
+     * @return AbstractSubmitHandler
      */
     public function getSubmitHandler($path)
     {
-        // iterate the submitHandlers array and return if found
+        // TODO: iterate the submitHandlers array and return if found
     }
 
     /**
-     * @param SubmitHandlerInterface $handler
+     * @param AbstractSubmitHandler $handler
      *
      * @return $this
      */
-    public function addSubmitHandler(SubmitHandlerInterface $handler)
+    public function addSubmitHandler(AbstractSubmitHandler $handler)
     {
         $path = $handler->getStepPath();
 
@@ -107,6 +115,13 @@ class WorkflowController
      * @return Step
      */
     public function getCurrentStep()
+    {
+    }
+
+    /**
+     * @return FormInterface
+     */
+    public function getCurrentForm()
     {
     }
 

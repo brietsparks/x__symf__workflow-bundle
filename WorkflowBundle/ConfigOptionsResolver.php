@@ -91,7 +91,7 @@ class ConfigOptionsResolver implements ConfigOptionsResolverInterface
             'form_loader_class',
             'submit_handler_callable',
             'next_step_callable',
-            'persistence_handler',
+            'persistence_handler_class',
             'roles_whitelist',
             'roles_blacklist',
         ]);
@@ -107,7 +107,7 @@ class ConfigOptionsResolver implements ConfigOptionsResolverInterface
             'form_loader_class' => null,
             'submit_handler_callable' => null,
             'next_step_callable' => null,
-            'persistence_handler' => null,
+            'persistence_handler_class' => null,
             'roles_whitelist' => null,
             'roles_blacklist' => null,
         ]);
@@ -123,7 +123,7 @@ class ConfigOptionsResolver implements ConfigOptionsResolverInterface
 //            'form_loader_class'=> ['string','NULL'],
 //            'submit_handler_callable' => ['callable','NULL'],
 //            'next_step_callable' => ['callable', 'NULL'],
-//            // 'persistence_handler'  => ? , // TODO: persistence handler option
+//            // 'persistence_handler_class'  => ? ,
 //            'roles_whitelist'  => 'array',
 //            'roles_blacklist'  => 'array',
 //        ]);

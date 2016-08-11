@@ -2,22 +2,42 @@
 
 namespace Bsapaka\WorkflowBundle;
 
-class defaultSubmitHandler implements SubmitHandlerInterface
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Session\Session;
+
+class SubmitHandler extends AbstractSubmitHandler
 {
+
+    /**
+     * @var Session
+     */
+    protected $session;
+
+    /**
+     * @var Request
+     */
+    protected $request;
+
+    /**
+     * SubmitHandler constructor.
+     * @param Session $session
+     */
+    public function __construct(Session $session, Request $request)
+    {
+        $this->session = $session;
+        $this->request = $request;
+    }
 
     public function handle()
     {
-        // TODO: Implement __invoke() method.
-    }
+        $form = $this->workflowController->getCurrentForm();
+        $form->handleRequest($this->request);
 
-    public function getStepName()
-    {
-        // TODO: Implement getStepName() method.
+//        $persistenceHandler = how is this passed in
     }
 
     public function getNextStepName()
     {
-        // TODO: Implement getNextStepName() method.
     }
 
 

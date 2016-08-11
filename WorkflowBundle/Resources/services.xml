@@ -8,8 +8,19 @@
 
         </service>
 
-        <service id="bsapaka_workflow.workflow_manager" class="Bsapaka\WorkflowBundle\WorkflowManager">
+        <service id="bsapaka_workflow.workflow_controller" class="Bsapaka\WorkflowBundle\WorkflowController">
+
         </service>
+
+        <service id="bsapaka_workflow.submit_handler.default" scope="request" class="Bsapaka\WorkflowBundle\SubmitHandler">
+            <argument type="service" id="session" />
+            <argument type="service" id="request" />
+        </service>
+
+        <service id="bsapaka_workflow.persistence.session" class="Bsapaka\WorkflowBundle\Persistence\SessionPersistence">
+            <argument type="service" id="session" />
+        </service>
+
         <service id="bsapaka_workflow.form_loader.default" class="Bsapaka\WorkflowBundle\FormLoader\FormLoader">
             <argument type="service" id="form.factory" />
             <tag name="bsapaka_workflow.form_loader" />
