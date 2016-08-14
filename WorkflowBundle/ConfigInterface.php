@@ -17,12 +17,12 @@ interface ConfigInterface
     /**
      * @return string
      */
-    public function getName();
+    public function getSlug();
 
     /**
      * @return string
      */
-    public function getUrlSegment();
+    public function getName();
 
     /**
      * @return string
@@ -48,5 +48,11 @@ interface ConfigInterface
      * @return mixed
      */
     public function getPersistenceHandler();
+
+    /**
+     * @return array
+     */
+    public function getPrerequisiteNodes();
+
 
 }

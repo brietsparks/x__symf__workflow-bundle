@@ -60,7 +60,15 @@ class Config implements ConfigInterface
      */
     public function getOption($option)
     {
-        return $this->options['option'];
+        return $this->options[$option];
+    }
+
+    /**
+     * @return string
+     */
+    public function getSlug()
+    {
+        return $this->options['slug'];
     }
 
     /**
@@ -69,14 +77,6 @@ class Config implements ConfigInterface
     public function getName()
     {
         return $this->options['name'];
-    }
-
-    /**
-     * @return string
-     */
-    public function getUrlSegment()
-    {
-        return $this->options['url_segment'];
     }
 
     /**
@@ -133,6 +133,14 @@ class Config implements ConfigInterface
     public function getRolesBlacklist()
     {
         return $this->options['roles_blacklist'];
+    }
+
+    /**
+     * @return array
+     */
+    public function getPrerequisiteNodes()
+    {
+        return $this->options['prerequisite_nodes'];
     }
 
 }

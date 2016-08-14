@@ -2,7 +2,6 @@
 
 namespace Bsapaka\WorkflowBundle;
 
-use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class ConfigOptionsResolver implements ConfigOptionsResolverInterface
@@ -66,27 +65,14 @@ class ConfigOptionsResolver implements ConfigOptionsResolverInterface
 
         $this->defineAllowedTypes($resolver);
 
-        $resolver->setRequired('name');
-    }
-
-    /**
-     * @param $string
-     *
-     * @return string
-     */
-    protected function sluggify($string)
-    {
-        $string = strtolower(trim($string));
-        $string = preg_replace('/[^a-z0-9-]/', '-', $string);
-        $string = preg_replace('/-+/', "-", $string);
-        return $string;
+        $resolver->setRequired('slug');
     }
 
     protected function defineOptions(OptionsResolver $resolver)
     {
         $resolver->setDefined([
+            'slug',
             'name',
-            'url_segment',
             'template',
             'form_loader_class',
             'submit_handler_callable',
@@ -94,15 +80,14 @@ class ConfigOptionsResolver implements ConfigOptionsResolverInterface
             'persistence_handler_class',
             'roles_whitelist',
             'roles_blacklist',
+            'prerequisite_nodes'
         ]);
     }
 
     protected function defineDefaults(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
-            'url_segment' =>  function (Options $options) {
-                return $this->sluggify($options['name']);
-            },
+            'name' => null,
             'template' => null,
             'form_loader_class' => null,
             'submit_handler_callable' => null,
@@ -110,6 +95,7 @@ class ConfigOptionsResolver implements ConfigOptionsResolverInterface
             'persistence_handler_class' => null,
             'roles_whitelist' => null,
             'roles_blacklist' => null,
+            'prerequisite_nodes' => []
         ]);
     }
 

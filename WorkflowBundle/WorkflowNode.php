@@ -22,11 +22,15 @@ abstract class WorkflowNode
     /**
      * @return string
      */
-    public function getName()
+    public function getSlug()
     {
-        return $this->getConfig()->getName();
+        return $this->getConfig()->getSlug();
     }
 
+
+
+    /* ========== Maybe using maybe not ========== */
+    #region maybe using maybe not
     /**
      * @return callable
      */
@@ -42,15 +46,17 @@ abstract class WorkflowNode
     {
         return $this->getConfig()->getNextStepCallable();
     }
+    #endregion
+    /* ==========            end          ========== */
 
-    // TODO: path related methods should be in their own class
-    // TODO: pathFinder, WorkflowTreeNavigator
+
+
     /**
      * @return array
      */
     public function getPathArray()
     {
-        $namePath[] = $this->getName();
+        $namePath[] = $this->getSlug();
 
         if ($parent = $this->getParent()) {
             $namePath = array_merge($parent->getPathArray(), $namePath);
@@ -64,7 +70,7 @@ abstract class WorkflowNode
      */
     public function getPath()
     {
-        return join(".", $this->getPathArray());
+        return join("/", $this->getPathArray());
     }
 
     /**
