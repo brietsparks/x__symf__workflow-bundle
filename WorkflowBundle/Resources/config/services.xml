@@ -9,7 +9,8 @@
         </service>
 
         <service id="bsapaka_workflow.workflow_controller" class="Bsapaka\WorkflowBundle\WorkflowController">
-
+            <argument type="service" id="session" />
+            <argument type="service" id="debug.event_dispatcher" />
         </service>
 
         <service id="bsapaka_workflow.submit_handler.default" scope="request" class="Bsapaka\WorkflowBundle\SubmitHandler">
